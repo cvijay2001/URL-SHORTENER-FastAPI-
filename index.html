@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5 mb-4">URL Shortener</h1>
+        <form id="urlShortenerForm">
+            <div class="form-group">
+                <label for="originalUrl">Original URL:</label>
+                <input type="text" class="form-control" id="originalUrl" name="originalUrl" required>
+            </div>
+            <div class="form-group">
+                <label for="alias">Alias (optional):</label>
+                <input type="text" class="form-control" id="alias" name="alias">
+            </div>
+            <button type="submit" class="btn btn-primary">Shorten URL</button>
+        </form>
+        <div id="shortenedUrl" class="mt-4"></div>
+    </div>
+
+    <script>
+        document.getElementById('urlShortenerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const originalUrl = document.getElementById('originalUrl').value;
+            const alias = document.getElementById('alias').value;
+
+            fetch('http://localhost:8000/url_shortener/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    og_url: originalUrl,
+                    alias: alias
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Do something with the response data if needed
+                console.log('Response:', data);
+
+                // Assuming the response contains the shortened URL
+                const shortenedUrl = data.short_url;
+                document.getElementById('shortenedUrl').innerHTML = `
+                    <div class="alert alert-success" role="alert">
+                        Shortened URL: <a href="${shortenedUrl}" target="_blank">${shortenedUrl}</a>
+                    </div>`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('shortenedUrl').innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        Error: Unable to shorten URL
+                    </div>`;
+            });
+        });
+    </script>
+</body>
+</html>
